@@ -13,13 +13,8 @@ import (
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 
-	"github.com/gorilla/mux"
+	"github.com/cosmos/cosmos-sdk/x/ibc/bank"
 )
-
-// RegisterRoutes - Central function to define routes that get registered by the main application
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec, kb keys.Keybase) {
-	r.HandleFunc("/ibc/{destchain}/{address}/send", TransferRequestHandlerFn(cdc, kb, cliCtx)).Methods("POST")
-}
 
 type transferBody struct {
 	// Fees             sdk.Coin  `json="fees"`
@@ -67,9 +62,24 @@ func TransferRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx context.
 			return
 		}
 
+		from, err := sdk.AccAddressFromBech32(string(info.GetPubKey().Address()))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
 		// build message
-		packet := ibc.NewIBCPacket(sdk.AccAddress(info.GetPubKey().Address()), to, m.Amount, m.SrcChainID, destChainID)
-		msg := ibc.IBCTransferMsg{packet}
+		p := bank.PayloadCoins{
+			SrcAddr:  from,
+			DestAddr: to,
+			Coins:    m.Amount,
+		}
+
+		msg := ibc.MsgSend{
+			Payload:   p,
+			DestChain: destChainID,
+		}
 
 		simulateGas, gas, err := client.ReadGasFlag(m.Gas)
 		if err != nil {

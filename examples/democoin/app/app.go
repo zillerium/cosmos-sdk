@@ -44,7 +44,7 @@ type DemocoinApp struct {
 	bankKeeper          bank.Keeper
 	coolKeeper          cool.Keeper
 	powKeeper           pow.Keeper
-	ibcMapper           ibc.Mapper
+	ibcKeeper           ibc.Keeper
 	stakeKeeper         simplestake.Keeper
 
 	// Manage getting and setting accounts
@@ -78,14 +78,14 @@ func NewDemocoinApp(logger log.Logger, db dbm.DB) *DemocoinApp {
 	app.bankKeeper = bank.NewBaseKeeper(app.accountMapper)
 	app.coolKeeper = cool.NewKeeper(app.capKeyMainStore, app.bankKeeper, app.RegisterCodespace(cool.DefaultCodespace))
 	app.powKeeper = pow.NewKeeper(app.capKeyPowStore, pow.NewConfig("pow", int64(1)), app.bankKeeper, app.RegisterCodespace(pow.DefaultCodespace))
-	app.ibcMapper = ibc.NewMapper(app.cdc, app.capKeyIBCStore, app.RegisterCodespace(ibc.DefaultCodespace))
+	app.ibcKeeper = ibc.NewKeeper(app.cdc, app.capKeyIBCStore, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.stakeKeeper = simplestake.NewKeeper(app.capKeyStakingStore, app.bankKeeper, app.RegisterCodespace(simplestake.DefaultCodespace))
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.bankKeeper)).
 		AddRoute("cool", cool.NewHandler(app.coolKeeper)).
 		AddRoute("pow", app.powKeeper.Handler).
 		AddRoute("sketchy", sketchy.NewHandler()).
-		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
+		AddRoute("ibc", ibc.NewHandler(app.ibcKeeper)).
 		AddRoute("simplestake", simplestake.NewHandler(app.stakeKeeper))
 
 	// Initialize BaseApp.

@@ -92,6 +92,5 @@ func createHandler(cdc *codec.Codec) http.Handler {
 	stake.RegisterRoutes(cliCtx, r, cdc, kb)
 	slashing.RegisterRoutes(cliCtx, r, cdc, kb)
 	gov.RegisterRoutes(cliCtx, r, cdc)
-
 	return r
 }
