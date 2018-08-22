@@ -1,8 +1,8 @@
 package lib
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
 )
 
 type Mapping interface {
@@ -13,11 +13,11 @@ type Mapping interface {
 }
 
 type mapping struct {
-	cdc   *wire.Codec
+	cdc   *codec.Codec
 	store sdk.KVStore
 }
 
-func NewMapping(cdc *wire.Codec, store sdk.KVStore) Mapping {
+func NewMapping(cdc *codec.Codec, store sdk.KVStore) Mapping {
 	return mapping{
 		cdc:   cdc,
 		store: store,
@@ -26,7 +26,7 @@ func NewMapping(cdc *wire.Codec, store sdk.KVStore) Mapping {
 
 func NewPrimitiveMapping(store sdk.KVStore) Mapping {
 	return mapping{
-		cdc:   wire.NewCodec(),
+		cdc:   codec.New(),
 		store: store,
 	}
 }

@@ -1,9 +1,9 @@
 package bank
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/lib"
-	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 )
@@ -13,13 +13,13 @@ const DefaultCodespace = 65534
 
 type Keeper struct {
 	key sdk.StoreKey
-	cdc *wire.Codec
+	cdc *codec.Codec
 
 	bk   bank.Keeper
 	ibck ibc.Keeper
 }
 
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, bk bank.Keeper, ibck ibc.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bk bank.Keeper, ibck ibc.Keeper) Keeper {
 	return Keeper{
 		key:  key,
 		cdc:  cdc,

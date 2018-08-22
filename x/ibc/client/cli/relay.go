@@ -8,11 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	codec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-<<<<<<< HEAD
-=======
 	"github.com/cosmos/cosmos-sdk/types/lib"
-	wire "github.com/cosmos/cosmos-sdk/wire"
->>>>>>> 3fc0192... Merge pull request #1481: IBC MVP Refactor
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
@@ -82,19 +78,18 @@ func IBCRelayCmd(cdc *codec.Codec) *cobra.Command {
 func (c relayCommander) runIBCRelay(cmd *cobra.Command, args []string) {
 	srcChainID := viper.GetString(FlagSrcChainID)
 	srcChainNode := viper.GetString(FlagSrcChainNode)
-	toChainID := viper.GetString(FlagDestChainID)
-	toChainNode := viper.GetString(FlagDestChainNode)
-	address, err := context.NewCoreContextFromViper().GetFromAddress()
+	destChainID := viper.GetString(FlagDestChainID)
+	destChainNode := viper.GetString(FlagDestChainNode)
+	address, err := context.NewCLIContext().GetFromAddress()
 	if err != nil {
 		panic(err)
 	}
 
 	c.address = address
 
-	ctx := context.NewCoreContextFromViper()
 	// TODO: use proper config
 	egressQueue := lib.NewLinearClient(ctx.WithNodeURI(srcChainNode), "bank", c.cdc, []byte("ibc/"), nil)
-	c.loop(egressQueue, srcChainID, toChainID, toChainNode)
+	c.loop(egressQueue, srcChainID, destChainID, destChainNode)
 }
 
 func (c relayCommander) processed(node string, srcChainID string) uint64 {
@@ -178,29 +173,3 @@ func (c relayCommander) getSequence(node string) int64 {
 
 	return 0
 }
-<<<<<<< HEAD
-
-func (c relayCommander) refine(bz []byte, sequence int64, passphrase string) []byte {
-	var packet ibc.IBCPacket
-	if err := c.cdc.UnmarshalBinary(bz, &packet); err != nil {
-		panic(err)
-	}
-
-	msg := ibc.IBCReceiveMsg{
-		IBCPacket: packet,
-		Relayer:   c.address,
-		Sequence:  sequence,
-	}
-
-	txBldr := authtxb.NewTxBuilderFromCLI().WithSequence(sequence).WithCodec(c.cdc)
-	cliCtx := context.NewCLIContext()
-
-	res, err := txBldr.BuildAndSign(cliCtx.FromAddressName, passphrase, []sdk.Msg{msg})
-	if err != nil {
-		panic(err)
-	}
-
-	return res
-}
-=======
->>>>>>> 3fc0192... Merge pull request #1481: IBC MVP Refactor
