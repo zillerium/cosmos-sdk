@@ -9,14 +9,14 @@ const (
 	DefaultCodespace sdk.CodespaceType = 3
 
 	// IBC errors reserve 200 - 299.
-	CodeConnectionNotEstablished     sdk.CodeType = 200
-	CodeConnectionAlreadyEstablished sdk.CodeType = 201
-	CodeChainMismatch                sdk.CodeType = 202
-	CodeChannelNotOpened             sdk.CodeType = 203
-	CodeChannelAlreadyOpened         sdk.CodeType = 204
-	CodeInvalidProof                 sdk.CodeType = 205
-	CodeInvalidPacket                sdk.CodeType = 206
-	CodeUnknownDatagramType          sdk.CodeType = 207
+	CodeConnNotEstablished     sdk.CodeType = 200
+	CodeConnAlreadyEstablished sdk.CodeType = 201
+	CodeChainMismatch          sdk.CodeType = 202
+	CodeChannelNotOpened       sdk.CodeType = 203
+	CodeChannelAlreadyOpened   sdk.CodeType = 204
+	CodeInvalidProof           sdk.CodeType = 205
+	CodeInvalidPacket          sdk.CodeType = 206
+	CodeUnknownDatagramType    sdk.CodeType = 207
 
 	/*
 
@@ -45,12 +45,12 @@ func codeToDefaultMsg(code sdk.CodeType) string {
 }
 
 // nolint
-func ErrConnectionNotEstablished(codespace sdk.CodespaceType) sdk.Error {
-	return newError(codespace, CodeConnectionNotEstablished, "")
+func ErrConnNotEstablished(codespace sdk.CodespaceType) sdk.Error {
+	return newError(codespace, CodeConnNotEstablished, "")
 }
 
-func ErrConnectionAlreadyEstablished(codespace sdk.CodespaceType) sdk.Error {
-	return newError(codespace, CodeConnectionAlreadyEstablished, "")
+func ErrConnAlreadyEstablished(codespace sdk.CodespaceType) sdk.Error {
+	return newError(codespace, CodeConnAlreadyEstablished, "")
 }
 
 func ErrChannelNotOpened(codespace sdk.CodespaceType) sdk.Error {

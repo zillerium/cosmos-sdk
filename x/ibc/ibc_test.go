@@ -100,7 +100,7 @@ func makeCodec() *codec.Codec {
 
 func newIBCTestApp(logger log.Logger, db dbm.DB) *bam.BaseApp {
 	cdc := makeCodec()
-	app := bam.NewBaseApp("test", cdc, logger, db)
+	app := bam.NewBaseApp("test", logger, db, nil)
 
 	key := sdk.NewKVStoreKey("remote")
 	ibcKey := sdk.NewKVStoreKey("ibc")
