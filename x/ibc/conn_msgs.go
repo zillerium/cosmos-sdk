@@ -8,19 +8,19 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// MsgOpenConnection defines the message that is used for open a c
+// MsgOpenConn defines the message that is used for open a c
 // that receives msg from another chain
-type MsgOpenConnection struct {
-	ROT      lite.FullCommit
-	SrcChain string
-	Signer   sdk.AccAddress
+type MsgOpenConn struct {
+	ROT     lite.FullCommit
+	ChainID string
+	Signer  sdk.AccAddress
 }
 
-func (msg MsgOpenConnection) Type() string {
+func (msg MsgOpenConn) Type() string {
 	return "ibc"
 }
 
-func (msg MsgOpenConnection) GetSignBytes() []byte {
+func (msg MsgOpenConn) GetSignBytes() []byte {
 	bz, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func (msg MsgOpenConnection) GetSignBytes() []byte {
 	return bz
 }
 
-func (msg MsgOpenConnection) ValidateBasic() sdk.Error {
+func (msg MsgOpenConn) ValidateBasic() sdk.Error {
 	if msg.ROT.Height() < 0 {
 		// XXX: Codespace will be removed
 		return ErrInvalidHeight(111)
@@ -36,22 +36,22 @@ func (msg MsgOpenConnection) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOpenConnection) GetSigners() []sdk.AccAddress {
+func (msg MsgOpenConn) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Signer}
 }
 
-type MsgUpdateConnection struct {
+type MsgUpdateConn struct {
 	SrcChain string
 	Commit   lite.FullCommit
 	//PacketProof
 	Signer sdk.AccAddress
 }
 
-func (msg MsgUpdateConnection) Type() string {
+func (msg MsgUpdateConn) Type() string {
 	return "ibc"
 }
 
-func (msg MsgUpdateConnection) GetSignBytes() []byte {
+func (msg MsgUpdateConn) GetSignBytes() []byte {
 	bz, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -59,7 +59,7 @@ func (msg MsgUpdateConnection) GetSignBytes() []byte {
 	return bz
 }
 
-func (msg MsgUpdateConnection) ValidateBasic() sdk.Error {
+func (msg MsgUpdateConn) ValidateBasic() sdk.Error {
 	if msg.Commit.Commit.Height() < 0 {
 		// XXX: Codespace will be removed
 		return ErrInvalidHeight(111)
@@ -67,6 +67,6 @@ func (msg MsgUpdateConnection) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgUpdateConnection) GetSigners() []sdk.AccAddress {
+func (msg MsgUpdateConn) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Signer}
 }

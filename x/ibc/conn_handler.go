@@ -9,10 +9,10 @@ import (
 func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
-		case MsgOpenConnection:
-			return handleMsgOpenConnection(ctx, k, msg)
-		case MsgUpdateConnection:
-			return handleMsgUpdateConnection(ctx, k, msg)
+		case MsgOpenConn:
+			return handleMsgOpenConn(ctx, k, msg)
+		case MsgUpdateConn:
+			return handleMsgUpdateConn(ctx, k, msg)
 		default:
 			errMsg := "Unrecognized IBC Msg type: " + reflect.TypeOf(msg).Name()
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -20,11 +20,11 @@ func NewHandler(k Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgOpenConnection(ctx sdk.Context, k Keeper, msg MsgOpenConnection) sdk.Result {
+func handleMsgOpenConn(ctx sdk.Context, k Keeper, msg MsgOpenConn) sdk.Result {
 	r := k.connRuntime(ctx, msg.SrcChain)
 
 	if r.connEstablished() {
-		return ErrConnectionAlreadyEstablished(k.codespace).Result()
+		return ErrConnAlreadyEstablished(k.codespace).Result()
 	}
 
 	height := uint64(msg.ROT.Height())
@@ -34,11 +34,11 @@ func handleMsgOpenConnection(ctx sdk.Context, k Keeper, msg MsgOpenConnection) s
 	return sdk.Result{}
 }
 
-func handleMsgUpdateConnection(ctx sdk.Context, k Keeper, msg MsgUpdateConnection) sdk.Result {
+func handleMsgUpdateConn(ctx sdk.Context, k Keeper, msg MsgUpdateConn) sdk.Result {
 	r := k.connRuntime(ctx, msg.SrcChain)
 
 	if !r.connEstablished() {
-		return ErrConnectionNotEstablished(k.codespace).Result()
+		return ErrConnNotEstablished(k.codespace).Result()
 	}
 
 	lastheight := r.getCommitHeight()

@@ -41,7 +41,7 @@ func (k Keeper) Receive(h ReceiveHandler, ctx sdk.Context, store sdk.KVStore, ms
 	destChain := msg.Datagram.Header.DestChain
 
 	if !connr.connEstablished() {
-		return ErrConnectionNotEstablished(k.codespace).Result()
+		return ErrConnNotEstablished(k.codespace).Result()
 	}
 
 	if ctx.ChainID() != destChain {
