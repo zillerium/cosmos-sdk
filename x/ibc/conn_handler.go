@@ -21,7 +21,7 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 func handleMsgOpenConn(ctx sdk.Context, k Keeper, msg MsgOpenConn) sdk.Result {
-	r := k.connRuntime(ctx, msg.SrcChain)
+	r := k.connRuntime(ctx, msg.ChainID)
 
 	if r.connEstablished() {
 		return ErrConnAlreadyEstablished(k.codespace).Result()

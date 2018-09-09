@@ -181,7 +181,7 @@ func TestIBC(t *testing.T) {
 	var res sdk.Result
 
 	// Open connection
-	openConnMsg := MsgOpenConnection{
+	openConnMsg := MsgOpenConn{
 		ROT: lite.FullCommit{
 			Commit: lite.Commit{
 				Header: &tmtypes.Header{

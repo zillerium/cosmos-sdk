@@ -21,8 +21,10 @@ const (
 	ChainID = "chain-id"
 )
 
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, kb keys.KeyBase) {
-	r.HandleFunc(fmt.Sprintf("/ibc/conn/{%s}/open", ChainID), connOpenHandlerFn(cdc, cliCtx)).Methods("POST")
+func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
+	r.HandleFunc(fmt.Sprintf("/ibc/conn/{%s}/open", ChainID), connOpenHandlerFn(cdc, kb, cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/ibc/conn/{%s}/update", ChainID), connUpdateHandlerFn(cdc, kb, cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/ibc/conn/{%s}/close", ChainID), connCloseHandler(cdc, kb, cliCtx)).Methods("POST")
 }
 
 type connOpenReq struct {
@@ -38,7 +40,7 @@ type connOpenReq struct {
 	ROT      lite.FullCommit `json:"root_of_trust"`
 }
 
-func connOpenHandlerFn(cdc *wire.Codec, kb keys.KeyBase, cliCtx context.CLIContext) http.HandlerFunc {
+func connOpenHandlerFn(cdc *wire.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var m connOpenReq
 		body, err := ioutil.ReadAll(r.Body)
