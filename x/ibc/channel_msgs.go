@@ -16,6 +16,10 @@ type MsgSend struct {
 	DestChain string
 }
 
+func (msg MsgSend) Name() string {
+	return "send"
+}
+
 func (msg MsgSend) GetSignBytes() []byte {
 	bz, err := json.Marshal(msg)
 	if err != nil {
@@ -30,6 +34,10 @@ type MsgReceive struct {
 	Datagram
 	Proof
 	Relayer sdk.AccAddress
+}
+
+func (msg MsgReceive) Name() string {
+	return "receive"
 }
 
 func (msg MsgReceive) GetSignBytes() []byte {
@@ -49,6 +57,10 @@ type MsgCleanup struct {
 	SrcChain string
 	Proof    Proof
 	Cleaner  sdk.AccAddress
+}
+
+func (msg MsgCleanup) Name() string {
+	return "cleanup"
 }
 
 func (msg MsgCleanup) GetSigners() []sdk.AccAddress {

@@ -20,6 +20,10 @@ func (msg MsgOpenConn) Type() string {
 	return "ibc"
 }
 
+func (msg MsgOpenConn) Name() string {
+	return "open_conn"
+}
+
 func (msg MsgOpenConn) GetSignBytes() []byte {
 	bz, err := json.Marshal(msg)
 	if err != nil {
@@ -49,6 +53,10 @@ type MsgUpdateConn struct {
 
 func (msg MsgUpdateConn) Type() string {
 	return "ibc"
+}
+
+func (msg MsgUpdateConn) Name() string {
+	return "update_conn"
 }
 
 func (msg MsgUpdateConn) GetSignBytes() []byte {

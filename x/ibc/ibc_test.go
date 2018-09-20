@@ -13,6 +13,7 @@ import (
 	"github.com/tendermint/tendermint/lite"
 	tmtypes "github.com/tendermint/tendermint/types"
 
+	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
