@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/pkg/errors"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -155,11 +156,16 @@ func (ctx CLIContext) broadcastTxCommit(txBytes []byte) (*ctypes.ResultBroadcast
 	}
 
 	if ctx.Output != nil {
-		resStr := fmt.Sprintf("Committed at block %d (tx hash: %s)\n", res.Height, res.Hash.String())
+		resStr := fmt.Sprintf("Committed at block %d\ntx hash: %s\n", res.Height, res.Hash.String())
 
 		if ctx.PrintResponse {
-			resStr = fmt.Sprintf("Committed at block %d (tx hash: %s, response: %+v)\n",
-				res.Height, res.Hash.String(), res.DeliverTx,
+			jsonDeliverTxResult, err := codec.MarshalJSONIndent(ctx.Codec, res.DeliverTx)
+			if err != nil {
+				jsonDeliverTxResult = []byte("Could not parse DeliverTx Response")
+			}
+
+			resStr = fmt.Sprintf("Committed at block %d\ntx hash: %s\nresponse: %+v)\n",
+				res.Height, res.Hash.String(), string(jsonDeliverTxResult),
 			)
 		}
 
