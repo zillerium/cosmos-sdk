@@ -291,7 +291,7 @@ func (app *GaiaApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 
 // export the state of gaia for a genesis file
 func (app *GaiaApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
-	ctx := app.NewContext(true, abci.Header{})
+	ctx, _ := app.NewContext(false, abci.Header{}).CacheContext()
 
 	// iterate to get the accounts
 	accounts := []GenesisAccount{}
