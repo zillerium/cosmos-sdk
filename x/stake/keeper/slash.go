@@ -101,12 +101,10 @@ func (k Keeper) Slash(ctx sdk.Context, consAddr sdk.ConsAddress, infractionHeigh
 	tokensToBurn = sdk.MaxDec(tokensToBurn, sdk.ZeroDec()) // defensive.
 
 	// Deduct from validator's bonded tokens and update the validator.
-	// The deducted tokens are returned to pool.LooseTokens.
+	// The deducted tokens are decreased from bondedTokens supply.
 	validator = k.RemoveValidatorTokens(ctx, validator, tokensToBurn)
-	pool := k.GetPool(ctx)
 	// Burn the slashed tokens, which are now loose.
-	pool.LooseTokens = pool.LooseTokens.Sub(tokensToBurn)
-	k.SetPool(ctx, pool)
+	k.burnStakingTokens(ctx, tokensToBurn.RoundInt())
 
 	// Log that a slash occurred!
 	logger.Info(fmt.Sprintf(
@@ -171,12 +169,10 @@ func (k Keeper) slashUnbondingDelegation(ctx sdk.Context, unbondingDelegation ty
 	if !unbondingSlashAmount.IsZero() {
 		unbondingDelegation.Balance.Amount = unbondingDelegation.Balance.Amount.Sub(unbondingSlashAmount)
 		k.SetUnbondingDelegation(ctx, unbondingDelegation)
-		pool := k.GetPool(ctx)
 
 		// Burn loose tokens
 		// Ref https://github.com/cosmos/cosmos-sdk/pull/1278#discussion_r198657760
-		pool.LooseTokens = pool.LooseTokens.Sub(sdk.NewDecFromInt(unbondingSlashAmount))
-		k.SetPool(ctx, pool)
+		k.burnStakingTokens(ctx, unbondingSlashAmount)
 	}
 
 	return
@@ -237,9 +233,7 @@ func (k Keeper) slashRedelegation(ctx sdk.Context, validator types.Validator, re
 		}
 
 		// Burn loose tokens
-		pool := k.GetPool(ctx)
-		pool.LooseTokens = pool.LooseTokens.Sub(tokensToBurn)
-		k.SetPool(ctx, pool)
+		k.burnStakingTokens(ctx, tokensToBurn.RoundInt())
 	}
 
 	return slashAmount

@@ -530,9 +530,7 @@ func (k Keeper) BeginUnbonding(ctx sdk.Context,
 	change := returnAmount.Sub(sdk.NewDecFromInt(rounded))
 
 	// for now, change is just burned
-	pool := k.GetPool(ctx)
-	pool.LooseTokens = pool.LooseTokens.Sub(change)
-	k.SetPool(ctx, pool)
+	k.burnStakingTokens(ctx, change.RoundInt())
 
 	// no need to create the ubd object just complete now
 	if completeNow {
@@ -657,4 +655,21 @@ func (k Keeper) CompleteRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 
 	k.RemoveRedelegation(ctx, red)
 	return nil
+}
+
+func (k Keeper) addTokensToValFromDel(ctx sdk.Context, v types.Validator, amt sdk.Int) (types.Validator, sdk.Dec) {
+	if v.Status == sdk.Bonded {
+		k.increaseBondedTokens(ctx, sdk.NewDecFromInt(amt))
+	}
+	return v.AddTokensFromDel(amt)
+}
+
+func (k Keeper) removeDelSharesFromVal(ctx sdk.Context, v types.Validator, delShares sdk.Dec) (types.Validator, sdk.Dec) {
+	v, issuedTokens := v.RemoveDelShares(delShares)
+
+	if v.Status == sdk.Bonded {
+		k.decreaseBondedTokens(ctx, issuedTokens)
+	}
+
+	return v, issuedTokens
 }

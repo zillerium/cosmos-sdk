@@ -80,29 +80,12 @@ func TestRemoveTokens(t *testing.T) {
 		DelegatorShares: sdk.NewDec(100),
 	}
 
-	pool := InitialPool()
-	pool.LooseTokens = sdk.NewDec(10)
-	pool.BondedTokens = validator.BondedTokens()
-
-	validator, pool = validator.UpdateStatus(pool, sdk.Bonded)
-	require.Equal(t, sdk.Bonded, validator.Status)
-
 	// remove tokens and test check everything
-	validator, pool = validator.RemoveTokens(pool, sdk.NewDec(10))
+	validator = validator.RemoveTokens(sdk.NewDec(10))
 	require.Equal(t, int64(90), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(90), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(20), pool.LooseTokens.RoundInt64())
 
-	// update validator to unbonded and remove some more tokens
-	validator, pool = validator.UpdateStatus(pool, sdk.Unbonded)
-	require.Equal(t, sdk.Unbonded, validator.Status)
-	require.Equal(t, int64(0), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(110), pool.LooseTokens.RoundInt64())
-
-	validator, pool = validator.RemoveTokens(pool, sdk.NewDec(10))
+	validator = validator.RemoveTokens(sdk.NewDec(10))
 	require.Equal(t, int64(80), validator.Tokens.RoundInt64())
-	require.Equal(t, int64(0), pool.BondedTokens.RoundInt64())
-	require.Equal(t, int64(110), pool.LooseTokens.RoundInt64())
 }
 
 func TestAddTokensValidatorBonded(t *testing.T) {
@@ -225,7 +208,7 @@ func TestUpdateStatus(t *testing.T) {
 }
 
 func TestPossibleOverflow(t *testing.T) {
-	poolTokens := sdk.NewDec(2159)
+	bondedTokens := sdk.NewDec(2159)
 	delShares := sdk.NewDec(391432570689183511).Quo(sdk.NewDec(40113011844664))
 	validator := Validator{
 		OperatorAddr:    addr1,
@@ -234,13 +217,9 @@ func TestPossibleOverflow(t *testing.T) {
 		Tokens:          poolTokens,
 		DelegatorShares: delShares,
 	}
-	pool := Pool{
-		LooseTokens:  sdk.NewDec(100),
-		BondedTokens: poolTokens,
-	}
 	tokens := int64(71)
 	msg := fmt.Sprintf("validator %#v", validator)
-	newValidator, _, _ := validator.AddTokensFromDel(pool, sdk.NewInt(tokens))
+	newValidator, _ := validator.AddTokensFromDel(sdk.NewInt(tokens))
 
 	msg = fmt.Sprintf("Added %d tokens to %s", tokens, msg)
 	require.False(t, newValidator.DelegatorShareExRate().LT(sdk.ZeroDec()),

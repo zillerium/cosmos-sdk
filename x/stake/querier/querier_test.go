@@ -26,7 +26,7 @@ func TestNewQuerier(t *testing.T) {
 	var validators [2]types.Validator
 	for i, amt := range amts {
 		validators[i] = types.NewValidator(sdk.ValAddress(keep.Addrs[i]), keep.PKs[i], types.Description{})
-		validators[i], pool, _ = validators[i].AddTokensFromDel(pool, amt)
+		validators[i], _ = keeper.addTokensToValFromDel(ctx, validators[i], sdk.NewInt(amt))
 		validators[i].BondIntraTxCounter = int16(i)
 		keeper.SetValidator(ctx, validators[i])
 		keeper.SetValidatorByPowerIndex(ctx, validators[i], pool)
@@ -116,7 +116,6 @@ func TestQueryParametersPool(t *testing.T) {
 func TestQueryValidators(t *testing.T) {
 	cdc := codec.New()
 	ctx, _, keeper := keep.CreateTestInput(t, false, 10000)
-	pool := keeper.GetPool(ctx)
 	params := keeper.GetParams(ctx)
 
 	// Create Validators
@@ -124,9 +123,8 @@ func TestQueryValidators(t *testing.T) {
 	var validators [2]types.Validator
 	for i, amt := range amts {
 		validators[i] = types.NewValidator(sdk.ValAddress(keep.Addrs[i]), keep.PKs[i], types.Description{})
-		validators[i], pool, _ = validators[i].AddTokensFromDel(pool, amt)
+		validators[i], _ = keeper.addTokensToValFromDel(ctx, validators[i], sdk.NewInt(amt))
 	}
-	keeper.SetPool(ctx, pool)
 	keeper.SetValidator(ctx, validators[0])
 	keeper.SetValidator(ctx, validators[1])
 

@@ -24,7 +24,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data types.GenesisState) (res [
 	// e.g. with a one-block offset - the first TM block is at height 0, so state updates applied from genesis.json are in block -1.
 	ctx = ctx.WithBlockHeight(-types.ValidatorUpdateDelay)
 
-	keeper.SetPool(ctx, data.Pool)
+	keeper.SetBondedTokens(ctx, data.BondedTokens)
 	keeper.SetParams(ctx, data.Params)
 	keeper.SetIntraTxCounter(ctx, data.IntraTxCounter)
 	keeper.SetLastTotalPower(ctx, data.LastTotalPower)

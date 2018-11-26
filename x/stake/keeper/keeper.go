@@ -6,7 +6,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/stake/types"
 )
 
 // keeper of the stake store
@@ -53,21 +52,21 @@ func (k Keeper) Codespace() sdk.CodespaceType {
 
 //_______________________________________________________________________
 
-// load the pool
-func (k Keeper) GetPool(ctx sdk.Context) (pool types.Pool) {
+// get the amount of bonded tokens
+func (k Keeper) GetBondedTokens(ctx sdk.Context) (bondedTokens sdk.Dec) {
 	store := ctx.KVStore(k.storeKey)
 	b := store.Get(PoolKey)
 	if b == nil {
 		panic("stored pool should not have been nil")
 	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &pool)
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &bondedTokens)
 	return
 }
 
-// set the pool
-func (k Keeper) SetPool(ctx sdk.Context, pool types.Pool) {
+// set the amount of bonded tokens
+func (k Keeper) SetBondedTokens(ctx sdk.Context, bondedTokens sdk.Dec) {
 	store := ctx.KVStore(k.storeKey)
-	b := k.cdc.MustMarshalBinaryLengthPrefixed(pool)
+	b := k.cdc.MustMarshalBinaryLengthPrefixed(bondedTokens)
 	store.Set(PoolKey, b)
 }
 

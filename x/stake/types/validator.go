@@ -323,49 +323,10 @@ func (v Validator) ABCIValidatorUpdateZero() abci.ValidatorUpdate {
 	}
 }
 
-// UpdateStatus updates the location of the shares within a validator
-// to reflect the new status
-func (v Validator) UpdateStatus(pool Pool, NewStatus sdk.BondStatus) (Validator, Pool) {
-
-	switch v.Status {
-	case sdk.Unbonded:
-
-		switch NewStatus {
-		case sdk.Unbonded:
-			return v, pool
-		case sdk.Bonded:
-			pool = pool.looseTokensToBonded(v.Tokens)
-		}
-	case sdk.Unbonding:
-
-		switch NewStatus {
-		case sdk.Unbonding:
-			return v, pool
-		case sdk.Bonded:
-			pool = pool.looseTokensToBonded(v.Tokens)
-		}
-	case sdk.Bonded:
-
-		switch NewStatus {
-		case sdk.Bonded:
-			return v, pool
-		default:
-			pool = pool.bondedTokensToLoose(v.Tokens)
-		}
-	}
-
-	v.Status = NewStatus
-	return v, pool
-}
-
 // removes tokens from a validator
-func (v Validator) RemoveTokens(pool Pool, tokens sdk.Dec) (Validator, Pool) {
-	if v.Status == sdk.Bonded {
-		pool = pool.bondedTokensToLoose(tokens)
-	}
-
+func (v Validator) RemoveTokens(tokens sdk.Dec) Validator {
 	v.Tokens = v.Tokens.Sub(tokens)
-	return v, pool
+	return v
 }
 
 // SetInitialCommission attempts to set a validator's initial commission. An
@@ -382,15 +343,11 @@ func (v Validator) SetInitialCommission(commission Commission) (Validator, sdk.E
 //_________________________________________________________________________________________________________
 
 // AddTokensFromDel adds tokens to a validator
-func (v Validator) AddTokensFromDel(pool Pool, amount sdk.Int) (Validator, Pool, sdk.Dec) {
+func (v Validator) AddTokensFromDel(amount sdk.Int) (Validator, sdk.Dec) {
 
 	// bondedShare/delegatedShare
 	exRate := v.DelegatorShareExRate()
 	amountDec := sdk.NewDecFromInt(amount)
-
-	if v.Status == sdk.Bonded {
-		pool = pool.looseTokensToBonded(amountDec)
-	}
 
 	if exRate.IsZero() {
 		panic("zero exRate should not happen")
@@ -399,20 +356,15 @@ func (v Validator) AddTokensFromDel(pool Pool, amount sdk.Int) (Validator, Pool,
 	issuedShares := amountDec.Quo(exRate)
 	v.DelegatorShares = v.DelegatorShares.Add(issuedShares)
 
-	return v, pool, issuedShares
+	return v, issuedShares
 }
 
 // RemoveDelShares removes delegator shares from a validator.
-func (v Validator) RemoveDelShares(pool Pool, delShares sdk.Dec) (Validator, Pool, sdk.Dec) {
+func (v Validator) RemoveDelShares(delShares sdk.Dec) (Validator, sdk.Dec) {
 	issuedTokens := v.DelegatorShareExRate().Mul(delShares)
 	v.Tokens = v.Tokens.Sub(issuedTokens)
 	v.DelegatorShares = v.DelegatorShares.Sub(delShares)
-
-	if v.Status == sdk.Bonded {
-		pool = pool.bondedTokensToLoose(issuedTokens)
-	}
-
-	return v, pool, issuedTokens
+	return v, issuedTokens
 }
 
 // DelegatorShareExRate gets the exchange rate of tokens over delegator shares.
