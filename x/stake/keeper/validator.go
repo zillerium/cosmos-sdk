@@ -145,12 +145,11 @@ func (k Keeper) AddValidatorTokensAndShares(ctx sdk.Context, validator types.Val
 func (k Keeper) RemoveValidatorTokensAndShares(ctx sdk.Context, validator types.Validator,
 	sharesToRemove sdk.Dec) (valOut types.Validator, removedTokens sdk.Dec) {
 
-	pool := k.GetPool(ctx)
-	k.DeleteValidatorByPowerIndex(ctx, validator, pool)
+	k.DeleteValidatorByPowerIndex(ctx, validator)
 	validator, pool, removedTokens = validator.RemoveDelShares(pool, sharesToRemove)
+	validator, removedTokens = k.removeDelSharesFromVal(ctx, validator, sharesToRemove)
 	k.SetValidator(ctx, validator)
-	k.SetPool(ctx, pool)
-	k.SetValidatorByPowerIndex(ctx, validator, pool)
+	k.SetValidatorByPowerIndex(ctx, validator)
 	return validator, removedTokens
 }
 
@@ -158,7 +157,7 @@ func (k Keeper) RemoveValidatorTokensAndShares(ctx sdk.Context, validator types.
 func (k Keeper) RemoveValidatorTokens(ctx sdk.Context, validator types.Validator, tokensToRemove sdk.Dec) types.Validator {
 
 	pool := k.GetPool(ctx)
-	k.DeleteValidatorByPowerIndex(ctx, validator, pool)
+	k.DeleteValidatorByPowerIndex(ctx, validator)
 
 	validator = validator.RemoveTokens(tokensToRemove)
 	if validator.Status == sdk.Bonded {
@@ -166,8 +165,7 @@ func (k Keeper) RemoveValidatorTokens(ctx sdk.Context, validator types.Validator
 	}
 
 	k.SetValidator(ctx, validator)
-	k.SetPool(ctx, pool)
-	k.SetValidatorByPowerIndex(ctx, validator, pool)
+	k.SetValidatorByPowerIndex(ctx, validator)
 	return validator
 }
 

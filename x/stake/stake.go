@@ -17,7 +17,6 @@ type (
 	UnbondingDelegation  = types.UnbondingDelegation
 	Redelegation         = types.Redelegation
 	Params               = types.Params
-	Pool                 = types.Pool
 	MsgCreateValidator   = types.MsgCreateValidator
 	MsgEditValidator     = types.MsgEditValidator
 	MsgDelegate          = types.MsgDelegate

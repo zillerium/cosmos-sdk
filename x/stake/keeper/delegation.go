@@ -602,9 +602,7 @@ func (k Keeper) BeginRedelegation(ctx sdk.Context, delAddr sdk.AccAddress,
 	change := returnAmount.Sub(sdk.NewDecFromInt(rounded))
 
 	// for now, change is just burned
-	pool := k.GetPool(ctx)
-	pool.LooseTokens = pool.LooseTokens.Sub(change)
-	k.SetPool(ctx, pool)
+	k.burnStakingTokens(ctx, change.RoundInt())
 
 	dstValidator, found := k.GetValidator(ctx, valDstAddr)
 	if !found {

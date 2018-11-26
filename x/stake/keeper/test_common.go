@@ -104,18 +104,16 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initCoins int64) (sdk.Context
 
 	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
 	keeper := NewKeeper(cdc, keyStake, tkeyStake, ck, pk.Subspace(DefaultParamspace), types.DefaultCodespace)
-	keeper.SetPool(ctx, types.InitialPool())
+	keeper.SetBondedTokens(ctx, sdk.ZeroDec())
 	keeper.SetParams(ctx, types.DefaultParams())
 
 	// fill all the addresses with some coins, set the loose pool tokens simultaneously
 	for _, addr := range Addrs {
-		pool := keeper.GetPool(ctx)
 		_, _, err := ck.AddCoins(ctx, addr, sdk.Coins{
 			{keeper.BondDenom(ctx), sdk.NewInt(initCoins)},
 		})
 		require.Nil(t, err)
-		pool.LooseTokens = pool.LooseTokens.Add(sdk.NewDec(initCoins))
-		keeper.SetPool(ctx, pool)
+		keeper.mintStakingTokens(ctx, sdk.NewInt(initCoins))
 	}
 
 	return ctx, accountKeeper, keeper
@@ -200,9 +198,8 @@ func ValidatorByPowerIndexExists(ctx sdk.Context, keeper Keeper, power []byte) b
 
 // update validator for testing
 func TestingUpdateValidator(keeper Keeper, ctx sdk.Context, validator types.Validator) types.Validator {
-	pool := keeper.GetPool(ctx)
 	keeper.SetValidator(ctx, validator)
-	keeper.SetValidatorByPowerIndex(ctx, validator, pool)
+	keeper.SetValidatorByPowerIndex(ctx, validator)
 	keeper.ApplyAndReturnValidatorSetUpdates(ctx)
 	validator, found := keeper.GetValidator(ctx, validator.OperatorAddr)
 	if !found {

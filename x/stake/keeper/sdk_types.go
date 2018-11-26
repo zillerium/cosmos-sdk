@@ -90,21 +90,12 @@ func (k Keeper) ValidatorByConsAddr(ctx sdk.Context, addr sdk.ConsAddress) sdk.V
 
 // total power from the bond (not last, but current)
 func (k Keeper) TotalPower(ctx sdk.Context) sdk.Dec {
-	pool := k.GetPool(ctx)
-	return pool.BondedTokens
-}
-
-// total power from the bond
-func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
-	pool := k.GetPool(ctx)
-	return pool.BondedRatio()
+	return k.GetBondedTokens(ctx)
 }
 
 // when minting new tokens
 func (k Keeper) InflateSupply(ctx sdk.Context, newTokens sdk.Dec) {
-	pool := k.GetPool(ctx)
-	pool.LooseTokens = pool.LooseTokens.Add(newTokens)
-	k.SetPool(ctx, pool)
+	k.increaseBondedTokens(ctx, newTokens)
 }
 
 //__________________________________________________________________________
