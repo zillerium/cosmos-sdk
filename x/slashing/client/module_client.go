@@ -2,7 +2,9 @@ package client
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/lcd"
 	"github.com/cosmos/cosmos-sdk/x/slashing/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/slashing/client/rest"
 	"github.com/spf13/cobra"
 	amino "github.com/tendermint/go-amino"
 )
@@ -15,6 +17,19 @@ type ModuleClient struct {
 
 func NewModuleClient(storeKey string, cdc *amino.Codec) ModuleClient {
 	return ModuleClient{storeKey, cdc}
+}
+
+// RegisterRoutes registers staking-related REST handlers to a router
+func (mc ModuleClient) RegisterRoutes(rs lcd.RestServer) {
+	rs.Mux.HandleFunc(
+		"/slashing/validators/{validatorPubKey}/signing_info",
+		rest.SigningInfoHandlerFn(rs.CliCtx, mc.storeKey, rs.Cdc),
+	).Methods("GET")
+
+	rs.Mux.HandleFunc(
+		"/slashing/validators/{validatorAddr}/unjail",
+		rest.UnjailRequestHandlerFn(rs.Cdc, rs.KeyBase, rs.CliCtx),
+	).Methods("POST")
 }
 
 // GetQueryCmd returns the cli query commands for this module

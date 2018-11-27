@@ -2,6 +2,7 @@ package client
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/lcd"
 	distCmds "github.com/cosmos/cosmos-sdk/x/distribution/client/cli"
 	"github.com/spf13/cobra"
 	amino "github.com/tendermint/go-amino"
@@ -16,6 +17,9 @@ type ModuleClient struct {
 func NewModuleClient(storeKey string, cdc *amino.Codec) ModuleClient {
 	return ModuleClient{storeKey, cdc}
 }
+
+// RegisterRoutes handles registration of lite client functionality
+func (mc ModuleClient) RegisterRoutes(rs lcd.RestServer) {}
 
 // GetQueryCmd returns the cli query commands for this module
 func (mc ModuleClient) GetQueryCmd() *cobra.Command {

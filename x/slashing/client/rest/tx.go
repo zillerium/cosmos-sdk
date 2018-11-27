@@ -17,7 +17,7 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec, kb keys.Keybase) {
 	r.HandleFunc(
 		"/slashing/validators/{validatorAddr}/unjail",
-		unjailRequestHandlerFn(cdc, kb, cliCtx),
+		UnjailRequestHandlerFn(cdc, kb, cliCtx),
 	).Methods("POST")
 }
 
@@ -26,7 +26,8 @@ type UnjailReq struct {
 	BaseReq utils.BaseReq `json:"base_req"`
 }
 
-func unjailRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
+// UnjailRequestHandlerFn handles the /slashing/validators/{validatorAddr}/unjail route
+func UnjailRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 

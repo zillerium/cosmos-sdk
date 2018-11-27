@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/cosmos/cosmos-sdk/client/lcd"
 	"github.com/spf13/cobra"
 )
 
@@ -8,4 +9,5 @@ import (
 type ModuleClients interface {
 	GetQueryCmd() *cobra.Command
 	GetTxCmd() *cobra.Command
+	RegisterRoutes(lcd.RestServer)
 }

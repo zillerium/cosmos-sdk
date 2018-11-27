@@ -29,22 +29,60 @@ const (
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec) {
-	r.HandleFunc("/gov/proposals", postProposalHandlerFn(cdc, cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/deposits", RestProposalID), depositHandlerFn(cdc, cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/votes", RestProposalID), voteHandlerFn(cdc, cliCtx)).Methods("POST")
+	r.HandleFunc(
+		"/gov/proposals",
+		PostProposalHandlerFn(cdc, cliCtx),
+	).Methods("POST")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}/deposits", RestProposalID),
+		DepositHandlerFn(cdc, cliCtx),
+	).Methods("POST")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}/votes", RestProposalID),
+		VoteHandlerFn(cdc, cliCtx),
+	).Methods("POST")
 
 	r.HandleFunc(
 		fmt.Sprintf("/gov/parameters/{%s}", RestParamsType),
-		queryParamsHandlerFn(cdc, cliCtx),
+		QueryParamsHandlerFn(cdc, cliCtx),
 	).Methods("GET")
 
-	r.HandleFunc("/gov/proposals", queryProposalsWithParameterFn(cdc, cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}", RestProposalID), queryProposalHandlerFn(cdc, cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/deposits", RestProposalID), queryDepositsHandlerFn(cdc, cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/deposits/{%s}", RestProposalID, RestDepositor), queryDepositHandlerFn(cdc, cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/tally", RestProposalID), queryTallyOnProposalHandlerFn(cdc, cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/votes", RestProposalID), queryVotesOnProposalHandlerFn(cdc, cliCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/gov/proposals/{%s}/votes/{%s}", RestProposalID, RestVoter), queryVoteHandlerFn(cdc, cliCtx)).Methods("GET")
+	r.HandleFunc(
+		"/gov/proposals",
+		QueryProposalsWithParameterFn(cdc, cliCtx),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}", RestProposalID),
+		QueryProposalHandlerFn(cdc, cliCtx),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}/deposits", RestProposalID),
+		QueryDepositsHandlerFn(cdc, cliCtx),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}/deposits/{%s}", RestProposalID, RestDepositor),
+		QueryDepositHandlerFn(cdc, cliCtx),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}/tally", RestProposalID),
+		QueryTallyOnProposalHandlerFn(cdc, cliCtx),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}/votes", RestProposalID),
+		QueryVotesOnProposalHandlerFn(cdc, cliCtx),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/gov/proposals/{%s}/votes/{%s}", RestProposalID, RestVoter),
+		QueryVoteHandlerFn(cdc, cliCtx),
+	).Methods("GET")
 }
 
 type postProposalReq struct {
@@ -68,7 +106,8 @@ type voteReq struct {
 	Option  string         `json:"option"` //  option from OptionSet chosen by the voter
 }
 
-func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// PostProposalHandlerFn handles the POST /gov/proposals route
+func PostProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req postProposalReq
 		err := utils.ReadRESTReq(w, r, cdc, &req)
@@ -100,7 +139,8 @@ func postProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 	}
 }
 
-func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// DepositHandlerFn handles the POST /gov/proposals/{{ .Proposal.ID }}/deposits route
+func DepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -139,7 +179,8 @@ func depositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerF
 	}
 }
 
-func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// VoteHandlerFn handles the POST /gov/proposals/{{ .Proposal.ID }}/votes route
+func VoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -184,7 +225,8 @@ func voteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc
 	}
 }
 
-func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// QueryParamsHandlerFn handles the GET /gov/parameters/{{ .Param.Name }} route
+func QueryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		paramType := vars[RestParamsType]
@@ -199,7 +241,8 @@ func queryParamsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Hand
 	}
 }
 
-func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// QueryProposalHandlerFn handles the GET /gov/proposals/{{ .Proposal.ID }} route
+func QueryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -235,7 +278,8 @@ func queryProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 	}
 }
 
-func queryDepositsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// QueryDepositsHandlerFn handles the GET /gov/proposals/{{ .Proposal.ID }}/deposits route
+func QueryDepositsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -263,7 +307,8 @@ func queryDepositsHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Ha
 	}
 }
 
-func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// QueryDepositHandlerFn handles the GET /gov/proposals/{{ .Proposal.ID }}/deposits/{{ .Deposit.ID }} route
+func QueryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -327,7 +372,8 @@ func queryDepositHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Han
 	}
 }
 
-func queryVoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// QueryVoteHandlerFn handles the GET /gov/proposals/{{ .Proposal.ID }}/votes/{{ .Vote.ID }} route
+func QueryVoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -394,8 +440,9 @@ func queryVoteHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 	}
 }
 
+// QueryVotesOnProposalHandlerFn handles the GET /gov/proposals/{{ .Proposal.ID }}/votes route
 // todo: Split this functionality into helper functions to remove the above
-func queryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]
@@ -429,8 +476,9 @@ func queryVotesOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 	}
 }
 
+// QueryProposalsWithParameterFn handles the GET /gov/proposals route
 // todo: Split this functionality into helper functions to remove the above
-func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+func QueryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		bechVoterAddr := r.URL.Query().Get(RestVoter)
 		bechDepositorAddr := r.URL.Query().Get(RestDepositor)
@@ -490,7 +538,8 @@ func queryProposalsWithParameterFn(cdc *codec.Codec, cliCtx context.CLIContext) 
 }
 
 // todo: Split this functionality into helper functions to remove the above
-func queryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
+// QueryTallyOnProposalHandlerFn handles the GET /gov/proposals/{{ .Proposal.ID }}/tally route
+func QueryTallyOnProposalHandlerFn(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		strProposalID := vars[RestProposalID]

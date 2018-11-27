@@ -21,112 +21,116 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 	// Get all delegations from a delegator
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/delegations",
-		delegatorDelegationsHandlerFn(cliCtx, cdc),
+		DelegatorDelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all unbonding delegations from a delegator
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/unbonding_delegations",
-		delegatorUnbondingDelegationsHandlerFn(cliCtx, cdc),
+		DelegatorUnbondingDelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all redelegations from a delegator
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/redelegations",
-		delegatorRedelegationsHandlerFn(cliCtx, cdc),
+		DelegatorRedelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all staking txs (i.e msgs) from a delegator
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/txs",
-		delegatorTxsHandlerFn(cliCtx, cdc),
+		DelegatorTxsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Query all validators that a delegator is bonded to
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/validators",
-		delegatorValidatorsHandlerFn(cliCtx, cdc),
+		DelegatorValidatorsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Query a validator that a delegator is bonded to
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/validators/{validatorAddr}",
-		delegatorValidatorHandlerFn(cliCtx, cdc),
+		DelegatorValidatorHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Query a delegation between a delegator and a validator
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/delegations/{validatorAddr}",
-		delegationHandlerFn(cliCtx, cdc),
+		DelegationHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Query all unbonding delegations between a delegator and a validator
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}",
-		unbondingDelegationHandlerFn(cliCtx, cdc),
+		UnbondingDelegationHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all validators
 	r.HandleFunc(
 		"/stake/validators",
-		validatorsHandlerFn(cliCtx, cdc),
+		ValidatorsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get a single validator info
 	r.HandleFunc(
 		"/stake/validators/{validatorAddr}",
-		validatorHandlerFn(cliCtx, cdc),
+		ValidatorHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all delegations to a validator
 	r.HandleFunc(
 		"/stake/validators/{validatorAddr}/delegations",
-		validatorDelegationsHandlerFn(cliCtx, cdc),
+		ValidatorDelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all unbonding delegations from a validator
 	r.HandleFunc(
 		"/stake/validators/{validatorAddr}/unbonding_delegations",
-		validatorUnbondingDelegationsHandlerFn(cliCtx, cdc),
+		ValidatorUnbondingDelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get all outgoing redelegations from a validator
 	r.HandleFunc(
 		"/stake/validators/{validatorAddr}/redelegations",
-		validatorRedelegationsHandlerFn(cliCtx, cdc),
+		ValidatorRedelegationsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get the current state of the staking pool
 	r.HandleFunc(
 		"/stake/pool",
-		poolHandlerFn(cliCtx, cdc),
+		PoolHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 	// Get the current staking parameter values
 	r.HandleFunc(
 		"/stake/parameters",
-		paramsHandlerFn(cliCtx, cdc),
+		ParamsHandlerFn(cliCtx, cdc),
 	).Methods("GET")
 
 }
 
+// DelegatorDelegationsHandlerFn handles the /stake/delegators/{delegatorAddr}/delegations route
 // HTTP request handler to query a delegator delegations
-func delegatorDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func DelegatorDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryDelegator(cliCtx, cdc, "custom/stake/delegatorDelegations")
 }
 
+// DelegatorUnbondingDelegationsHandlerFn handles the /stake/delegators/{delegatorAddr}/unbonding_delegations route
 // HTTP request handler to query a delegator unbonding delegations
-func delegatorUnbondingDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func DelegatorUnbondingDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryDelegator(cliCtx, cdc, "custom/stake/delegatorUnbondingDelegations")
 }
 
+// DelegatorRedelegationsHandlerFn handles the /stake/delegators/{delegatorAddr}/redelegations route
 // HTTP request handler to query a delegator redelegations
-func delegatorRedelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func DelegatorRedelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryDelegator(cliCtx, cdc, "custom/stake/delegatorRedelegations")
 }
 
+// DelegatorTxsHandlerFn handles the /stake/delegators/{delegatorAddr}/txs route
 // HTTP request handler to query all staking txs (msgs) from a delegator
-func delegatorTxsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func DelegatorTxsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var typesQuerySlice []string
 		vars := mux.Vars(r)
@@ -196,28 +200,33 @@ func delegatorTxsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Han
 	}
 }
 
+// UnbondingDelegationHandlerFn handles the /stake/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr} route
 // HTTP request handler to query an unbonding-delegation
-func unbondingDelegationHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func UnbondingDelegationHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryBonds(cliCtx, cdc, "custom/stake/unbondingDelegation")
 }
 
+// DelegationHandlerFn handles the /stake/delegators/{delegatorAddr}/delegations/{validatorAddr} route
 // HTTP request handler to query a delegation
-func delegationHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func DelegationHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryBonds(cliCtx, cdc, "custom/stake/delegation")
 }
 
+// DelegatorValidatorsHandlerFn handles the /stake/delegators/{delegatorAddr}/validators route
 // HTTP request handler to query all delegator bonded validators
-func delegatorValidatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func DelegatorValidatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryDelegator(cliCtx, cdc, "custom/stake/delegatorValidators")
 }
 
+// DelegatorValidatorHandlerFn handles the /stake/delegators/{delegatorAddr}/validators/{validatorAddr} route
 // HTTP request handler to get information from a currently bonded validator
-func delegatorValidatorHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func DelegatorValidatorHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryBonds(cliCtx, cdc, "custom/stake/delegatorValidator")
 }
 
+// ValidatorsHandlerFn handles the /stake/validators function
 // HTTP request handler to query list of validators
-func validatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func ValidatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, err := cliCtx.QueryWithData("custom/stake/validators", nil)
 		if err != nil {
@@ -228,28 +237,33 @@ func validatorsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 	}
 }
 
+// ValidatorHandlerFn handles the /stake/validators/{validatorAddr} route
 // HTTP request handler to query the validator information from a given validator address
-func validatorHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func ValidatorHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryValidator(cliCtx, cdc, "custom/stake/validator")
 }
 
+// ValidatorDelegationsHandlerFn handles the /stake/validators/{validatorAddr}/delegations route
 // HTTP request handler to query all unbonding delegations from a validator
-func validatorDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func ValidatorDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryValidator(cliCtx, cdc, "custom/stake/validatorDelegations")
 }
 
+// ValidatorUnbondingDelegationsHandlerFn handles the /stake/validators/{validatorAddr}/unbonding_delegations route
 // HTTP request handler to query all unbonding delegations from a validator
-func validatorUnbondingDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func ValidatorUnbondingDelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryValidator(cliCtx, cdc, "custom/stake/validatorUnbondingDelegations")
 }
 
+// ValidatorRedelegationsHandlerFn handles the /stake/validators/{validatorAddr}/redelegations route
 // HTTP request handler to query all redelegations from a source validator
-func validatorRedelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func ValidatorRedelegationsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return queryValidator(cliCtx, cdc, "custom/stake/validatorRedelegations")
 }
 
+// PoolHandlerFn handles the /stake/pool route
 // HTTP request handler to query the pool information
-func poolHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func PoolHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, err := cliCtx.QueryWithData("custom/stake/pool", nil)
 		if err != nil {
@@ -260,8 +274,9 @@ func poolHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc
 	}
 }
 
+// ParamsHandlerFn handles the /stake/parameters route
 // HTTP request handler to query the staking params values
-func paramsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func ParamsHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, err := cliCtx.QueryWithData("custom/stake/parameters", nil)
 		if err != nil {

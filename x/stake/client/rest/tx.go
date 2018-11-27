@@ -22,7 +22,7 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec, kb keys.Keybase) {
 	r.HandleFunc(
 		"/stake/delegators/{delegatorAddr}/delegations",
-		delegationsRequestHandlerFn(cdc, kb, cliCtx),
+		DelegationsRequestHandlerFn(cdc, kb, cliCtx),
 	).Methods("POST")
 }
 
@@ -59,7 +59,7 @@ type (
 // TODO: use sdk.ValAddress instead of sdk.AccAddress for validators in messages
 // TODO: Seriously consider how to refactor...do we need to make it multiple txs?
 // If not, we can just use CompleteAndBroadcastTxREST.
-func delegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
+func DelegationsRequestHandlerFn(cdc *codec.Codec, kb keys.Keybase, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req EditDelegationsReq
 
