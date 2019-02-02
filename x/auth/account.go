@@ -208,27 +208,13 @@ func (bva BaseVestingAccount) spendableCoins(vestingCoins sdk.Coins) sdk.Coins {
 	var spendableCoins sdk.Coins
 	bc := bva.GetCoins()
 
-	j, k := 0, 0
 	for _, coin := range bc {
-		// zip/lineup all coins by their denomination to provide O(n) time
-		for j < len(vestingCoins) && vestingCoins[j].Denom != coin.Denom {
-			j++
-		}
-		for k < len(bva.DelegatedVesting) && bva.DelegatedVesting[k].Denom != coin.Denom {
-			k++
-		}
 
 		baseAmt := coin.Amount
 
-		vestingAmt := sdk.ZeroInt()
-		if len(vestingCoins) > 0 {
-			vestingAmt = vestingCoins[j].Amount
-		}
+		vestingAmt := vestingCoins.AmountOf(coin.Denom)
 
-		delVestingAmt := sdk.ZeroInt()
-		if len(bva.DelegatedVesting) > 0 {
-			delVestingAmt = bva.DelegatedVesting[k].Amount
-		}
+		delVestingAmt := bva.DelegatedVesting.AmountOf(coin.Denom)
 
 		// compute min((BC + DV) - V, BC) per the specification
 		min := sdk.MinInt(baseAmt.Add(delVestingAmt).Sub(vestingAmt), baseAmt)
