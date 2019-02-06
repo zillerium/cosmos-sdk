@@ -52,6 +52,7 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	c = c.WithGasMeter(stypes.NewInfiniteGasMeter())
 	c = c.WithMinGasPrices(DecCoins{})
 	c = c.WithConsensusParams(nil)
+	c = c.WithTags(EmptyTags())
 	return c
 }
 
@@ -146,6 +147,7 @@ const (
 	contextKeyBlockGasMeter
 	contextKeyMinGasPrices
 	contextKeyConsensusParams
+	contextKeyTags
 )
 
 func (c Context) MultiStore() MultiStore {
@@ -169,6 +171,8 @@ func (c Context) VoteInfos() []abci.VoteInfo {
 func (c Context) GasMeter() GasMeter { return c.Value(contextKeyGasMeter).(GasMeter) }
 
 func (c Context) BlockGasMeter() GasMeter { return c.Value(contextKeyBlockGasMeter).(GasMeter) }
+
+func (c Context) Tags() Tags { return c.Value(contextKeyTags).(Tags) }
 
 func (c Context) IsCheckTx() bool { return c.Value(contextKeyIsCheckTx).(bool) }
 
@@ -220,6 +224,8 @@ func (c Context) WithGasMeter(meter GasMeter) Context { return c.withValue(conte
 func (c Context) WithBlockGasMeter(meter GasMeter) Context {
 	return c.withValue(contextKeyBlockGasMeter, meter)
 }
+
+func (c Context) WithTags(tags Tags) Context { return c.withValue(contextKeyTags, tags) }
 
 func (c Context) WithIsCheckTx(isCheckTx bool) Context {
 	return c.withValue(contextKeyIsCheckTx, isCheckTx)
