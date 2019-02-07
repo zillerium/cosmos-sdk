@@ -21,6 +21,7 @@ var (
 //______________________________________________________________________
 
 // MsgCreateValidator - struct for bonding transactions
+//proteus:generate
 type MsgCreateValidator struct {
 	Description   Description    `json:"description"`
 	Commission    CommissionMsg  `json:"commission"`
@@ -139,6 +140,7 @@ func (msg MsgCreateValidator) ValidateBasic() sdk.Error {
 //______________________________________________________________________
 
 // MsgEditValidator - struct for editing a validator
+//proteus:generate
 type MsgEditValidator struct {
 	Description
 	ValidatorAddr sdk.ValAddress `json:"address"`
@@ -188,6 +190,7 @@ func (msg MsgEditValidator) ValidateBasic() sdk.Error {
 //______________________________________________________________________
 
 // MsgDelegate - struct for bonding transactions
+//proteus:generate
 type MsgDelegate struct {
 	DelegatorAddr sdk.AccAddress `json:"delegator_addr"`
 	ValidatorAddr sdk.ValAddress `json:"validator_addr"`
@@ -232,6 +235,7 @@ func (msg MsgDelegate) ValidateBasic() sdk.Error {
 //______________________________________________________________________
 
 // MsgDelegate - struct for bonding transactions
+//proteus:generate
 type MsgBeginRedelegate struct {
 	DelegatorAddr    sdk.AccAddress `json:"delegator_addr"`
 	ValidatorSrcAddr sdk.ValAddress `json:"validator_src_addr"`
@@ -283,6 +287,7 @@ func (msg MsgBeginRedelegate) ValidateBasic() sdk.Error {
 //______________________________________________________________________
 
 // MsgUndelegate - struct for unbonding transactions
+//proteus:generate
 type MsgUndelegate struct {
 	DelegatorAddr sdk.AccAddress `json:"delegator_addr"`
 	ValidatorAddr sdk.ValAddress `json:"validator_addr"`

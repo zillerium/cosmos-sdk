@@ -73,6 +73,7 @@ var _ Account = (*BaseAccount)(nil)
 // This can be extended by embedding within in your AppAccount.
 // However one doesn't have to use BaseAccount as long as your struct
 // implements Account.
+//proteus:generate
 type BaseAccount struct {
 	Address       sdk.AccAddress `json:"address"`
 	Coins         sdk.Coins      `json:"coins"`
@@ -179,6 +180,7 @@ func (acc *BaseAccount) SpendableCoins(_ time.Time) sdk.Coins {
 
 // BaseVestingAccount implements the VestingAccount interface. It contains all
 // the necessary fields needed for any vesting account implementation.
+//proteus:generate
 type BaseVestingAccount struct {
 	*BaseAccount
 
@@ -339,6 +341,7 @@ var _ VestingAccount = (*ContinuousVestingAccount)(nil)
 
 // ContinuousVestingAccount implements the VestingAccount interface. It
 // continuously vests by unlocking coins linearly with respect to time.
+//proteus:generate
 type ContinuousVestingAccount struct {
 	*BaseVestingAccount
 
@@ -507,6 +510,7 @@ func (dva *DelayedVestingAccount) GetEndTime() int64 {
 // Codec
 
 // Most users shouldn't use this, but this comes in handy for tests.
+//proteus:generate
 func RegisterBaseAccount(cdc *codec.Codec) {
 	cdc.RegisterInterface((*Account)(nil), nil)
 	cdc.RegisterInterface((*VestingAccount)(nil), nil)

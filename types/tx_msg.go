@@ -53,6 +53,7 @@ type TxEncoder func(tx Tx) ([]byte, error)
 var _ Msg = (*TestMsg)(nil)
 
 // msg type for testing
+//proteus:generate
 type TestMsg struct {
 	signers []AccAddress
 }

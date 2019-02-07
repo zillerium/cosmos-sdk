@@ -329,6 +329,7 @@ func TestInitChainer(t *testing.T) {
 }
 
 // Simple tx with a list of Msgs.
+//proteus:generate
 type txTest struct {
 	Msgs       []sdk.Msg
 	Counter    int64
@@ -356,6 +357,7 @@ const (
 
 // ValidateBasic() fails on negative counters.
 // Otherwise it's up to the handlers
+//proteus:generate
 type msgCounter struct {
 	Counter       int64
 	FailOnHandler bool
@@ -382,6 +384,7 @@ func newTxCounter(txInt int64, msgInts ...int64) *txTest {
 }
 
 // a msg we dont know how to route
+//proteus:generate
 type msgNoRoute struct {
 	msgCounter
 }
@@ -389,6 +392,7 @@ type msgNoRoute struct {
 func (tx msgNoRoute) Route() string { return "noroute" }
 
 // a msg we dont know how to decode
+//proteus:generate
 type msgNoDecode struct {
 	msgCounter
 }
@@ -396,6 +400,7 @@ type msgNoDecode struct {
 func (tx msgNoDecode) Route() string { return routeMsgCounter }
 
 // Another counter msg. Duplicate of msgCounter
+//proteus:generate
 type msgCounter2 struct {
 	Counter int64
 }

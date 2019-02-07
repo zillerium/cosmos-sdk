@@ -89,6 +89,7 @@ var _ Info = &ledgerInfo{}
 var _ Info = &offlineInfo{}
 
 // localInfo is the public information about a locally stored key
+//proteus:generate
 type localInfo struct {
 	Name         string        `json:"name"`
 	PubKey       crypto.PubKey `json:"pubkey"`
@@ -120,6 +121,7 @@ func (i localInfo) GetAddress() types.AccAddress {
 }
 
 // ledgerInfo is the public information about a Ledger key
+//proteus:generate
 type ledgerInfo struct {
 	Name   string         `json:"name"`
 	PubKey crypto.PubKey  `json:"pubkey"`
@@ -151,6 +153,7 @@ func (i ledgerInfo) GetAddress() types.AccAddress {
 }
 
 // offlineInfo is the public information about an offline key
+//proteus:generate
 type offlineInfo struct {
 	Name   string        `json:"name"`
 	PubKey crypto.PubKey `json:"pubkey"`
