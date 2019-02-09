@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"sync"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -13,6 +14,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/cli"
 )
+
+var listenLock sync.Mutex
 
 // Get a free address for a test tendermint server
 // protocol is either tcp, http, etc
