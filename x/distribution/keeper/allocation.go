@@ -21,6 +21,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 	// temporary workaround to keep CanWithdrawInvariant happy
 	// general discussions here: https://github.com/cosmos/cosmos-sdk/issues/2906#issuecomment-441867634
 	if totalPower == 0 {
+		fmt.Println(">>>> WHOA")
 		feePool.CommunityPool = feePool.CommunityPool.Add(feesCollected)
 		k.SetFeePool(ctx, feePool)
 		return
@@ -54,6 +55,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 
 	// allocate tokens proportionally to voting power
 	// TODO consider parallelizing later, ref https://github.com/cosmos/cosmos-sdk/pull/3099#discussion_r246276376
+	fmt.Println(">>> VOTES: ", len(votes))
 	for _, vote := range votes {
 		validator := k.stakingKeeper.ValidatorByConsAddr(ctx, vote.Validator.Address)
 
@@ -77,6 +79,10 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 func (k Keeper) AllocateTokensToValidator(ctx sdk.Context, val sdk.Validator, tokens sdk.DecCoins) {
 
 	if val.GetOperator().String() == "cosmosvaloper1l67uvpuauv6wd90rvuln8ywp3trwfcc6csx0hn" {
+		fmt.Println("--------")
+		fmt.Printf("allocate to validator: val %+v, tokens %v\n", val, tokens)
+		fmt.Println("--------")
+	} else {
 		fmt.Printf("allocate to validator: val %+v, tokens %v\n", val, tokens)
 	}
 

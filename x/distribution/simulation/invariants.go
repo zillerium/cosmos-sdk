@@ -71,6 +71,7 @@ func CanWithdrawInvariant(k distr.Keeper, sk types.StakingKeeper) sdk.Invariant 
 				}
 			}
 			remaining = k.GetValidatorOutstandingRewards(ctx, val.GetOperator())
+			fmt.Println(">>>> remaining ", val.GetOperator().String(), remaining)
 			if len(remaining) > 0 && remaining[0].Amount.LT(sdk.ZeroDec()) {
 				panic("OH NO")
 				return true

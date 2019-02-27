@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -35,6 +37,8 @@ func (h Hooks) AfterValidatorRemoved(ctx sdk.Context, _ sdk.ConsAddress, valAddr
 		// update outstanding
 		outstanding := h.k.GetValidatorOutstandingRewards(ctx, valAddr)
 		h.k.SetValidatorOutstandingRewards(ctx, valAddr, outstanding.Sub(commission))
+		fmt.Println(">>>>> validator outstanding sub commission", valAddr, outstanding, commission)
+		panic("ok")
 
 		// add to validator account
 		if !coins.IsZero() {

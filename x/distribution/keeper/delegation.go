@@ -80,6 +80,7 @@ func (k Keeper) calculateDelegationRewards(ctx sdk.Context, val sdk.Validator, d
 						height, endingPeriod, k.calculateDelegationRewardsBetween(ctx, val, startingPeriod, endingPeriod, stake))
 				}
 				rewards = rewards.Add(k.calculateDelegationRewardsBetween(ctx, val, startingPeriod, endingPeriod, stake))
+				fmt.Println("IIIIIIIIII", rewards)
 				// note: necessary to truncate so we don't allow withdrawing more rewards than owed
 				stake = stake.MulTruncate(sdk.OneDec().Sub(event.Fraction))
 				startingPeriod = endingPeriod
@@ -122,10 +123,11 @@ func (k Keeper) withdrawDelegationRewards(ctx sdk.Context, val sdk.Validator, de
 
 	outstanding := k.GetValidatorOutstandingRewards(ctx, del.GetValidatorAddr())
 	if len(rewards) > 0 && len(outstanding) > 0 && rewards[0].IsGTE(outstanding[0]) {
-		fmt.Printf("startingPeriod: %v\n", startingPeriod)
-		fmt.Printf("endingPeriod: %v\n", endingPeriod)
-		fmt.Printf("withdraw from %v to %v\n", val, del)
-		fmt.Printf("rewards: %v, outstanding: %v\n", rewards, outstanding)
+		fmt.Printf("!>startingPeriod: %v\n", startingPeriod)
+		fmt.Printf(" > endingPeriod: %v\n", endingPeriod)
+		fmt.Printf(" > withdraw from %v to %v\n", val, del)
+		fmt.Printf(" > rewards: %v, outstanding: %v\n", rewards, outstanding)
+		panic("?")
 	}
 	k.SetValidatorOutstandingRewards(ctx, del.GetValidatorAddr(), outstanding.Sub(rewards))
 	feePool := k.GetFeePool(ctx)

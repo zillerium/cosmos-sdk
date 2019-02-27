@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -86,6 +88,8 @@ func (k Keeper) WithdrawValidatorCommission(ctx sdk.Context, valAddr sdk.ValAddr
 	// update outstanding
 	outstanding := k.GetValidatorOutstandingRewards(ctx, valAddr)
 	k.SetValidatorOutstandingRewards(ctx, valAddr, outstanding.Sub(sdk.NewDecCoins(coins)))
+	fmt.Println(">>>>>> validator outstanding sub coins", valAddr, outstanding, sdk.NewDecCoins(coins))
+	panic("ok")
 
 	if !coins.IsZero() {
 		accAddr := sdk.AccAddress(valAddr)

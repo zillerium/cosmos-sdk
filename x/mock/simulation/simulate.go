@@ -150,9 +150,11 @@ func SimulateFromSeed(tb testing.TB, app *baseapp.BaseApp,
 
 		// Run the BeginBlock handler
 		logWriter("BeginBlock")
+		fmt.Println("BEGINBLOCK")
 		app.BeginBlock(request)
 
 		if testingMode {
+			logWriter("INVARIANT-BeginBlock")
 			assertAllInvariants(t, app, invariants, "BeginBlock", displayLogs)
 		}
 
@@ -171,6 +173,7 @@ func SimulateFromSeed(tb testing.TB, app *baseapp.BaseApp,
 			logWriter, displayLogs, eventStats.tally)
 
 		if testingMode && onOperation {
+			logWriter("INVARIANT-OnOperation-Qd")
 			assertAllInvariants(t, app, invariants, "QueuedOperations", displayLogs)
 		}
 
@@ -178,6 +181,7 @@ func SimulateFromSeed(tb testing.TB, app *baseapp.BaseApp,
 		operations := blockSimulator(r, app, ctx, accs, header, logWriter)
 		opCount += operations + numQueuedOpsRan + numQueuedTimeOpsRan
 		if testingMode {
+			logWriter("INVARIANT-OnOperation-Std")
 			assertAllInvariants(t, app, invariants, "StandardOperations", displayLogs)
 		}
 
@@ -191,6 +195,7 @@ func SimulateFromSeed(tb testing.TB, app *baseapp.BaseApp,
 		logWriter("EndBlock")
 
 		if testingMode {
+			logWriter("INVARIANT-EndBlock")
 			assertAllInvariants(t, app, invariants, "EndBlock", displayLogs)
 		}
 		if commit {
@@ -281,6 +286,7 @@ func createBlockSimulator(testingMode bool, tb testing.TB, t *testing.T, params 
 			if testingMode {
 				if onOperation {
 					eventStr := fmt.Sprintf("operation: %v", logUpdate)
+					logWriter("INVARIANT-DUNNO")
 					assertAllInvariants(t, app, invariants, eventStr, displayLogs)
 				}
 				if opCount%50 == 0 {
