@@ -27,6 +27,7 @@ func (k Keeper) initializeValidator(ctx sdk.Context, val sdk.Validator) {
 func (k Keeper) incrementValidatorPeriod(ctx sdk.Context, val sdk.Validator) uint64 {
 	// fetch current rewards
 	rewards := k.GetValidatorCurrentRewards(ctx, val.GetOperator())
+	fmt.Println(">>>>>>>> increment validator period w/ rewards", rewards)
 
 	// calculate current ratio
 	var current sdk.DecCoins

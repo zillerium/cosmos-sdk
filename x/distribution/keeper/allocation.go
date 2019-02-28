@@ -57,6 +57,10 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 	// allocate tokens proportionally to voting power
 	// TODO consider parallelizing later, ref https://github.com/cosmos/cosmos-sdk/pull/3099#discussion_r246276376
 	fmt.Println(">>> VOTES: ", len(votes))
+	for i, vote := range votes {
+		fmt.Printf(">>> vote %v addr %X power %v signed %v\n",
+			i, vote.Validator.Address, vote.Validator.Power, vote.SignedLastBlock)
+	}
 	for _, vote := range votes {
 		validator := k.stakingKeeper.ValidatorByConsAddr(ctx, vote.Validator.Address)
 
@@ -64,6 +68,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 		// ref https://github.com/cosmos/cosmos-sdk/issues/2525#issuecomment-430838701
 		powerFraction := sdk.NewDec(vote.Validator.Power).QuoTruncate(sdk.NewDec(totalPower))
 		reward := feesCollected.MulDecTruncate(voteMultiplier).MulDecTruncate(powerFraction)
+		fmt.Println(">>>>> ALLOCATING VALIDATOR REWARD", powerFraction, reward)
 		k.AllocateTokensToValidator(ctx, validator, reward)
 		remaining = remaining.Sub(reward)
 	}
