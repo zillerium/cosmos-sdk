@@ -47,6 +47,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 		// e.g. a validator undelegates at block X, it's removed entirely by
 		// block X+1's endblock, then X+2 we need to refer to the previous
 		// proposer for X+1, but we've forgotten about them.
+		fmt.Println(">>>> unknown proposer with reward", proposerReward)
 	}
 
 	// calculate fraction allocated to validators
@@ -68,6 +69,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 	}
 
 	fmt.Printf("remaining after: %v\n", remaining)
+	fmt.Println("feesCollected", feesCollected, "voteMultiplier", voteMultiplier, "supposed-to-be-commtax", feesCollected.MulDecTruncate(communityTax))
 
 	// allocate community funding
 	feePool.CommunityPool = feePool.CommunityPool.Add(remaining)

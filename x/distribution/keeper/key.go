@@ -74,7 +74,7 @@ func GetValidatorHistoricalRewardsAddressPeriod(key []byte) (valAddr sdk.ValAddr
 	if len(b) != 8 {
 		panic("unexpected key length")
 	}
-	period = binary.LittleEndian.Uint64(b)
+	period = binary.BigEndian.Uint64(b)
 	return
 }
 
@@ -134,7 +134,7 @@ func GetValidatorHistoricalRewardsPrefix(v sdk.ValAddress) []byte {
 // gets the key for a validator's historical rewards
 func GetValidatorHistoricalRewardsKey(v sdk.ValAddress, k uint64) []byte {
 	b := make([]byte, 8)
-	binary.LittleEndian.PutUint64(b, k)
+	binary.BigEndian.PutUint64(b, k)
 	return append(append(ValidatorHistoricalRewardsPrefix, v.Bytes()...), b...)
 }
 

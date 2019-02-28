@@ -31,7 +31,8 @@ func (k Keeper) incrementValidatorPeriod(ctx sdk.Context, val sdk.Validator) uin
 	// calculate current ratio
 	var current sdk.DecCoins
 	if val.GetTokens().IsZero() {
-		fmt.Println(">>>>>>>> outstanding sub rewards", rewards.Rewards, rewards)
+		fmt.Println(">>>>>>>> outstanding -(rewards)-> community_pool")
+		fmt.Printf(">>>>>>>> rewards %#v\n", rewards)
 		// can't calculate ratio for zero-token validators
 		// ergo we instead add to the community pool
 		feePool := k.GetFeePool(ctx)
@@ -40,11 +41,15 @@ func (k Keeper) incrementValidatorPeriod(ctx sdk.Context, val sdk.Validator) uin
 		outstanding = outstanding.Sub(rewards.Rewards)
 		k.SetFeePool(ctx, feePool)
 		k.SetValidatorOutstandingRewards(ctx, val.GetOperator(), outstanding)
-
 		current = sdk.DecCoins{}
 	} else {
 		// note: necessary to truncate so we don't allow withdrawing more rewards than owed
 		current = rewards.Rewards.QuoDecTruncate(val.GetTokens().ToDec())
+		if current.IsZero() {
+			fmt.Println(">>>>> current calc rewards", rewards.Rewards, "valtokens", val.GetTokens(), "current", current)
+		} else {
+			fmt.Println(">>>>>!current calc rewards", rewards.Rewards, "valtokens", val.GetTokens(), "current", current)
+		}
 	}
 
 	// fetch historical rewards for last period

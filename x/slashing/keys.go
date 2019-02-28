@@ -50,7 +50,7 @@ func GetValidatorMissedBlockBitArrayPrefixKey(v sdk.ConsAddress) []byte {
 // stored by *Tendermint* address (not operator address)
 func GetValidatorMissedBlockBitArrayKey(v sdk.ConsAddress, i int64) []byte {
 	b := make([]byte, 8)
-	binary.LittleEndian.PutUint64(b, uint64(i))
+	binary.BigEndian.PutUint64(b, uint64(i))
 	return append(GetValidatorMissedBlockBitArrayPrefixKey(v), b...)
 }
 
