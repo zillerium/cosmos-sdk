@@ -30,6 +30,13 @@ const (
 	DefaultKeyPass = "12345678"
 )
 
+var (
+	// Temporary vars for cosmos launch w/ send disabled.
+	atomsToUatoms = int64(1000000)
+	// Sends are enabled for cli tests via go tags.
+	sendEnabled = false
+)
+
 // default home directories for expected binaries
 var (
 	DefaultCLIHome  = os.ExpandEnv("$HOME/.gaiacli")
@@ -170,7 +177,32 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	)
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(auth.NewAnteHandler(app.accountKeeper, app.feeCollectionKeeper))
+
+	authAnteHandler := auth.NewAnteHandler(app.accountKeeper, app.feeCollectionKeeper)
+
+	filterAnteHandler := func(ctx sdk.Context, tx sdk.Tx, simulate bool) (newCtx sdk.Context, result sdk.Result, abort bool) {
+		newCtx, result, abort = authAnteHandler(ctx, tx, simulate)
+		if abort == true {
+			return
+		}
+
+		// TODO remove this once transfers are enabled.
+		if !sendEnabled {
+			for _, msg := range tx.GetMsgs() {
+				switch msg.(type) {
+				case bank.MsgSend:
+					return ctx, bank.ErrSendDisabled(bank.DefaultCodespace).Result(), true
+				case bank.MsgMultiSend:
+					if !validateMultiSendTransfersDisabled(msg.(bank.MsgMultiSend)) {
+						return ctx, bank.ErrSendDisabled(bank.DefaultCodespace).Result(), true
+					}
+				}
+			}
+		}
+		return
+	}
+
+	app.SetAnteHandler(filterAnteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
 	if loadLatest {
@@ -181,6 +213,30 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	}
 
 	return app
+}
+
+// CheckTransferDisabledBurnMultiSend
+func validateMultiSendTransfersDisabled(msg bank.MsgMultiSend) bool {
+	nineAtoms := sdk.Coins{sdk.NewInt64Coin("uatom", 9*atomsToUatoms)}
+	oneAtom := sdk.Coins{sdk.NewInt64Coin("uatom", 1*atomsToUatoms)}
+
+	if len(msg.Inputs) != 1 {
+		return false
+	}
+	if len(msg.Outputs) != 2 {
+		return false
+	}
+
+	if !msg.Outputs[0].Address.Equals(bank.BurnedCoinsAccAddr) {
+		return false
+	}
+	if !msg.Outputs[0].Coins.IsEqual(nineAtoms) {
+		return false
+	}
+	if !msg.Outputs[1].Coins.IsEqual(oneAtom) {
+		return false
+	}
+	return true
 }
 
 // custom tx codec

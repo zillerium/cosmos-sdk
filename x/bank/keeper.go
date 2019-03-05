@@ -7,9 +7,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 var _ Keeper = (*BaseKeeper)(nil)
+
+// Account to send burned coins to
+var BurnedCoinsAccAddr = sdk.AccAddress(crypto.AddressHash([]byte("bankBurnedCoins")))
 
 // Keeper defines a module interface that facilitates the transfer of coins
 // between accounts.
@@ -120,9 +124,6 @@ type SendKeeper interface {
 	ViewKeeper
 
 	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.Tags, sdk.Error)
-
-	GetSendEnabled(ctx sdk.Context) bool
-	SetSendEnabled(ctx sdk.Context, enabled bool)
 }
 
 var _ SendKeeper = (*BaseSendKeeper)(nil)
@@ -156,19 +157,6 @@ func (keeper BaseSendKeeper) SendCoins(
 		return nil, sdk.ErrInvalidCoins(amt.String())
 	}
 	return sendCoins(ctx, keeper.ak, fromAddr, toAddr, amt)
-}
-
-// GetSendEnabled returns the current SendEnabled
-// nolint: errcheck
-func (keeper BaseSendKeeper) GetSendEnabled(ctx sdk.Context) bool {
-	var enabled bool
-	keeper.paramSpace.Get(ctx, ParamStoreKeySendEnabled, &enabled)
-	return enabled
-}
-
-// SetSendEnabled sets the send enabled
-func (keeper BaseSendKeeper) SetSendEnabled(ctx sdk.Context, enabled bool) {
-	keeper.paramSpace.Set(ctx, ParamStoreKeySendEnabled, &enabled)
 }
 
 var _ ViewKeeper = (*BaseViewKeeper)(nil)
