@@ -304,11 +304,11 @@ func BenchmarkFullGaiaSimulation(b *testing.B) {
 	logger := log.NewNopLogger()
 
 	var db dbm.DB
-	dir, _ := ioutil.TempDir("", "goleveldb-gaia-sim")
+	dir, _ := ioutil.TempDir("", sdk.DBBackend+"-gaia-sim")
 	db, _ = sdk.NewLevelDB("Simulation", dir)
 	defer func() {
 		db.Close()
-		os.RemoveAll(dir)
+		//		os.RemoveAll(dir)
 	}()
 	app := NewGaiaApp(logger, db, nil, true)
 
@@ -327,9 +327,9 @@ func BenchmarkFullGaiaSimulation(b *testing.B) {
 		b.Fail()
 	}
 	if commit {
-		fmt.Println("GoLevelDB Stats")
+		fmt.Println(sdk.DBBackend + " Stats")
 		fmt.Println(db.Stats()["leveldb.stats"])
-		fmt.Println("GoLevelDB cached block size", db.Stats()["leveldb.cachedblock"])
+		fmt.Println(sdk.DBBackend+" cached block size", db.Stats()["leveldb.cachedblock"])
 	}
 }
 
