@@ -55,7 +55,7 @@ endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
-BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
+BUILD_FLAGS := -tags '$(build_tags)' -ldflags '$(ldflags)'
 
 all: devtools vendor-deps install test_lint test
 
@@ -82,7 +82,7 @@ else
 endif
 
 buildflags:
-	@echo $(BUILD_FLAGS)
+	$(info $(BUILD_FLAGS))
 
 build-linux: vendor-deps
 	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
