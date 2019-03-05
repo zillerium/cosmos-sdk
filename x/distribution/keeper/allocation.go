@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -42,7 +41,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 	proposerValidator := k.stakingKeeper.ValidatorByConsAddr(ctx, proposer)
 	if proposerValidator != nil {
 		k.AllocateTokensToValidator(ctx, proposerValidator, proposerReward)
-		remaining = feesCollected.Sub(proposerReward)
+		remaining = remaining.Sub(proposerReward)
 	} else {
 		// proposer can be unknown if say, the unbonding period is 1 block, so
 		// e.g. a validator undelegates at block X, it's removed entirely by
@@ -75,15 +74,11 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, sumPrecommitPower, totalPower in
 	feePool.CommunityPool = feePool.CommunityPool.Add(remaining)
 	k.SetFeePool(ctx, feePool)
 
-	// update outstanding rewards
-	outstanding := k.GetOutstandingRewards(ctx)
-	outstanding = outstanding.Add(feesCollected.Sub(remaining))
-	k.SetOutstandingRewards(ctx, outstanding)
-
 }
 
 // allocate tokens to a particular validator, splitting according to commission
 func (k Keeper) AllocateTokensToValidator(ctx sdk.Context, val sdk.Validator, tokens sdk.DecCoins) {
+
 	// split tokens between validator and delegators according to commission
 	commission := tokens.MulDec(val.GetCommission())
 	shared := tokens.Sub(commission)
@@ -97,4 +92,9 @@ func (k Keeper) AllocateTokensToValidator(ctx sdk.Context, val sdk.Validator, to
 	currentRewards := k.GetValidatorCurrentRewards(ctx, val.GetOperator())
 	currentRewards.Rewards = currentRewards.Rewards.Add(shared)
 	k.SetValidatorCurrentRewards(ctx, val.GetOperator(), currentRewards)
+
+	// update outstanding rewards
+	outstanding := k.GetValidatorOutstandingRewards(ctx, val.GetOperator())
+	outstanding = outstanding.Add(tokens)
+	k.SetValidatorOutstandingRewards(ctx, val.GetOperator(), outstanding)
 }
