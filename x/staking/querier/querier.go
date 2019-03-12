@@ -35,31 +35,44 @@ func NewQuerier(k keep.Keeper, cdc *codec.Codec) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
 		case QueryValidators:
-			return queryValidators(ctx, cdc, k)
+			ptr := new(QueryValidatorsParams)
+			return ptr, querierValidators(ptr, k)
 		case QueryValidator:
-			return queryValidator(ctx, cdc, req, k)
+			ptr := new(QueryValidatorParams)
+			return ptr, querierValidator(ptr, k)
 		case QueryValidatorDelegations:
-			return queryValidatorDelegations(ctx, cdc, req, k)
+			ptr := new(QueryValidatorDelegationsParams)
+			return ptr, querierValidatorDelegations(ptr, k)
 		case QueryValidatorUnbondingDelegations:
-			return queryValidatorUnbondingDelegations(ctx, cdc, req, k)
+			ptr := new(QueryValidatorUnbondingDelegationsParams)
+			return ptr, querierValidatorUnbondingDelegations(ptr, k)
 		case QueryDelegation:
-			return queryDelegation(ctx, cdc, req, k)
+			ptr := new(QueryDelegationParams)
+			return ptr, querierDelegation(ptr, k)
 		case QueryUnbondingDelegation:
-			return queryUnbondingDelegation(ctx, cdc, req, k)
+			ptr := new(QueryUnbondingDelegationParams)
+			return ptr, querierUnbondingDelegation(ptr, k)
 		case QueryDelegatorDelegations:
-			return queryDelegatorDelegations(ctx, cdc, req, k)
+			ptr := new(QueryDelegatorDelegationsParams)
+			return ptr, querierDelegatorDelegations(ptr, k)
 		case QueryDelegatorUnbondingDelegations:
-			return queryDelegatorUnbondingDelegations(ctx, cdc, req, k)
+			ptr := new(QueryDelegatorUnbondingDelegationsParams)
+			return ptr, querierDelegatorUnbondingDelegations(ptr, k)
 		case QueryRedelegations:
-			return queryRedelegations(ctx, cdc, req, k)
+			ptr := new(QueryRedelegationsParams)
+			return ptr, querierRedelegations(ptr, k)
 		case QueryDelegatorValidators:
-			return queryDelegatorValidators(ctx, cdc, req, k)
+			ptr := new(QueryDelegatorValidatorsParams)
+			return ptr, querierDelegatorValidators(ptr, k)
 		case QueryDelegatorValidator:
-			return queryDelegatorValidator(ctx, cdc, req, k)
+			ptr := new(QueryDelegatorValidatorParams)
+			return ptr, querierDelegatorValidator(ptr, k)
 		case QueryPool:
-			return queryPool(ctx, cdc, k)
+			ptr := new(QueryPoolParams)
+			return ptr, querierPool(ptr, k)
 		case QueryParameters:
-			return queryParameters(ctx, cdc, k)
+			ptr := new(QueryParametersParams)
+			return ptr, querierParameters(ptr, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown staking query endpoint")
 		}

@@ -29,21 +29,29 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
 		case QueryParams:
-			return queryParams(ctx, path[1:], req, keeper)
+			ptr := new(QueryParamsParams)
+			return ptr, querierParams(ptr, k)
 		case QueryProposals:
-			return queryProposals(ctx, path[1:], req, keeper)
+			ptr := new(QueryProposalsParams)
+			return ptr, querierProposals(ptr, k)
 		case QueryProposal:
-			return queryProposal(ctx, path[1:], req, keeper)
+			ptr := new(QueryProposalParams)
+			return ptr, querierProposal(ptr, k)
 		case QueryDeposits:
-			return queryDeposits(ctx, path[1:], req, keeper)
+			ptr := new(QueryDepositsParams)
+			return ptr, querierDeposits(ptr, k)
 		case QueryDeposit:
-			return queryDeposit(ctx, path[1:], req, keeper)
+			ptr := new(QueryDepositParams)
+			return ptr, querierDeposit(ptr, k)
 		case QueryVotes:
-			return queryVotes(ctx, path[1:], req, keeper)
+			ptr := new(QueryVotesParams)
+			return ptr, querierVotes(ptr, k)
 		case QueryVote:
-			return queryVote(ctx, path[1:], req, keeper)
+			ptr := new(QueryVoteParams)
+			return ptr, querierVote(ptr, k)
 		case QueryTally:
-			return queryTally(ctx, path[1:], req, keeper)
+			ptr := new(QueryTallyParams)
+			return ptr, querierTally(ptr, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown gov query endpoint")
 		}

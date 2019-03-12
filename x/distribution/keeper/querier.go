@@ -27,43 +27,55 @@ const (
 	ParamWithdrawAddrEnabled = "withdraw_addr_enabled"
 )
 
-func PathToQuerier(path []string, k Keeper) (sdk.QueryInput, func(sdk.Context)) {
+func NewQuerier(k Keeper) sdk.Querier {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
+		ptr, querier := pathToQuerier(path)
+		k.cdc.UnmarhsalJSON(req.Data, ptr)
+		err := k.cdc.UnmarshalJSON(req.Data, ptr)
+		if err != nil {
+			return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
+		}
+		return querier(ctx)
+	}
+}
+
+func pathToQuerier(path []string, k Keeper) (sdk.QueryInput, func(sdk.Context) ([]byte, sdk.Error)) {
 	switch path[0] {
 	case QueryParams:
-		return pathToQuerierParams(path[1:], k)
+		ptr := new(QueryParamsParams)
+		return ptr, querierParams(ptr, k)
 
 	case QueryValidatorOutstandingRewards:
 		ptr := new(QueryValidatorOutstandingRewardsParams)
 		return ptr, querierValidatorOutstandingRewards(ptr, k)
 
 	case QueryValidatorCommission:
-		return queryValidatorCommission(ctx, path[1:], req, k)
+		ptr := new(QueryValidatorCommissionParams)
+		return ptr, querierValidatorCommission(ptr, k)
 
 	case QueryValidatorSlashes:
-		return queryValidatorSlashes(ctx, path[1:], req, k)
+		ptr := new(QueryValidatorSlashesParams)
+		return ptr, querierValidatorSlashes(ptr, k)
 
 	case QueryDelegationRewards:
-		return queryDelegationRewards(ctx, path[1:], req, k)
+		ptr := new(QueryDelegationRewardsParams)
+		return ptr, querierDelegationRewards(ptr, k)
 
 	case QueryDelegatorTotalRewards:
-		return queryDelegatorTotalRewards(ctx, path[1:], req, k)
+		ptr := new(QueryDelegatorTotalRewardsParams)
+		return ptr, querierDelegatorTotalRewards(ptr, k)
 
 	case QueryDelegatorValidators:
-		return queryDelegatorValidators(ctx, path[1:], req, k)
+		ptr := new(QueryDelegatorValidatorsParams)
+		return ptr, querierDelegatorValidators(ptr, k)
 
 	case QueryWithdrawAddr:
-		return queryDelegatorWithdrawAddress(ctx, path[1:], req, k)
+		ptr := new(QueryWithdrawAddrParams)
+		return ptr, querierWithdrawAddr(ptr, k)
 
 	default:
 		return nil, sdk.ErrUnknownRequest("unknown distr query endpoint")
 
-	}
-}
-
-func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
-		switch path[0] {
-		}
 	}
 }
 

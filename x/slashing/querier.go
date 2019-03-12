@@ -17,7 +17,8 @@ func NewQuerier(k Keeper, cdc *codec.Codec) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
 		case QueryParameters:
-			return queryParams(ctx, cdc, k)
+			ptr := new(QueryParametersParams)
+			return ptr, querierParameters(ptr, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown staking query endpoint")
 		}

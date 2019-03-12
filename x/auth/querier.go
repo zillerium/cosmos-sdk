@@ -17,12 +17,37 @@ const (
 // creates a querier for auth REST endpoints
 func NewQuerier(keeper AccountKeeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
-		switch path[0] {
-		case QueryAccount:
-			return queryAccount(ctx, req, keeper)
-		default:
+		ptr, querier := pathToQuerier(path, keeper)
+		if querier == nil {
 			return nil, sdk.ErrUnknownRequest("unknown auth query endpoint")
 		}
+		rawerr := keeper.cdc.UnmarshalJSON(req.Data, ptr)
+		if rawerr := keeper.cdc.UnmarshalJSON(req.Data, ptr); rawerr != nil {
+			return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", rawerr))
+		}
+		res, err := querier(ctx)
+		if err != nil {
+			return nil, err
+		}
+		bz, rawerr := codec.MarshalJSONIndent(keeper.cdc, res)
+		if rawerr != nil {
+			return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", rawerr.Error()))
+		}
+
+		return bz, nil
+
+	}
+}
+
+type querier func(ctx sdk.Context) (interface{}, sdk.Error)
+
+func pathToQuerier(path []string, k AccountKeeper) (sdk.QueryInput, querier) {
+	switch path[0] {
+	case QueryAccount:
+		ptr := new(QueryAccountParams)
+		return ptr, querierAccount(ptr, k)
+	default:
+		return nil, nil
 	}
 }
 
@@ -31,27 +56,25 @@ type QueryAccountParams struct {
 	Address sdk.AccAddress
 }
 
+func (params QueryAccountParams) ValidateInput() sdk.Error {
+	if params.Address.Empty() {
+		return sdk.ErrInvalidAddress("missing query address")
+	}
+	return nil
+}
+
 func NewQueryAccountParams(addr sdk.AccAddress) QueryAccountParams {
 	return QueryAccountParams{
 		Address: addr,
 	}
 }
 
-func queryAccount(ctx sdk.Context, req abci.RequestQuery, keeper AccountKeeper) ([]byte, sdk.Error) {
-	var params QueryAccountParams
-	if err := keeper.cdc.UnmarshalJSON(req.Data, &params); err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to parse params: %s", err))
+func querierAccount(params *QueryAccountParams, k AccountKeeper) querier {
+	return func(ctx sdk.Context) (interface{}, sdk.Error) {
+		account := k.GetAccount(ctx, params.Address)
+		if account == nil {
+			return nil, sdk.ErrUnknownAddress(fmt.Sprintf("account %s does not exist", params.Address))
+		}
+		return account, nil
 	}
-
-	account := keeper.GetAccount(ctx, params.Address)
-	if account == nil {
-		return nil, sdk.ErrUnknownAddress(fmt.Sprintf("account %s does not exist", params.Address))
-	}
-
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, account)
-	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
-	}
-
-	return bz, nil
 }

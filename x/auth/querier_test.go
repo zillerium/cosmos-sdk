@@ -15,7 +15,10 @@ func Test_queryAccount(t *testing.T) {
 		Data: []byte{},
 	}
 
-	res, err := queryAccount(input.ctx, req, input.ak)
+	querier := NewQuerier(input.ak)
+	querier(ctx, req.path)
+
+	res, err := querierAccount(nil, input.ak)(input.ctx)
 	require.NotNil(t, err)
 	require.Nil(t, res)
 
