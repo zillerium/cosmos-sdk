@@ -27,35 +27,42 @@ const (
 	ParamWithdrawAddrEnabled = "withdraw_addr_enabled"
 )
 
+func PathToQuerier(path []string, k Keeper) (sdk.QueryInput, func(sdk.Context)) {
+	switch path[0] {
+	case QueryParams:
+		return pathToQuerierParams(path[1:], k)
+
+	case QueryValidatorOutstandingRewards:
+		ptr := new(QueryValidatorOutstandingRewardsParams)
+		return ptr, querierValidatorOutstandingRewards(ptr, k)
+
+	case QueryValidatorCommission:
+		return queryValidatorCommission(ctx, path[1:], req, k)
+
+	case QueryValidatorSlashes:
+		return queryValidatorSlashes(ctx, path[1:], req, k)
+
+	case QueryDelegationRewards:
+		return queryDelegationRewards(ctx, path[1:], req, k)
+
+	case QueryDelegatorTotalRewards:
+		return queryDelegatorTotalRewards(ctx, path[1:], req, k)
+
+	case QueryDelegatorValidators:
+		return queryDelegatorValidators(ctx, path[1:], req, k)
+
+	case QueryWithdrawAddr:
+		return queryDelegatorWithdrawAddress(ctx, path[1:], req, k)
+
+	default:
+		return nil, sdk.ErrUnknownRequest("unknown distr query endpoint")
+
+	}
+}
+
 func NewQuerier(k Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
-		case QueryParams:
-			return queryParams(ctx, path[1:], req, k)
-
-		case QueryValidatorOutstandingRewards:
-			return queryValidatorOutstandingRewards(ctx, path[1:], req, k)
-
-		case QueryValidatorCommission:
-			return queryValidatorCommission(ctx, path[1:], req, k)
-
-		case QueryValidatorSlashes:
-			return queryValidatorSlashes(ctx, path[1:], req, k)
-
-		case QueryDelegationRewards:
-			return queryDelegationRewards(ctx, path[1:], req, k)
-
-		case QueryDelegatorTotalRewards:
-			return queryDelegatorTotalRewards(ctx, path[1:], req, k)
-
-		case QueryDelegatorValidators:
-			return queryDelegatorValidators(ctx, path[1:], req, k)
-
-		case QueryWithdrawAddr:
-			return queryDelegatorWithdrawAddress(ctx, path[1:], req, k)
-
-		default:
-			return nil, sdk.ErrUnknownRequest("unknown distr query endpoint")
 		}
 	}
 }
@@ -94,6 +101,10 @@ func queryParams(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper
 // params for query 'custom/distr/validator_outstanding_rewards'
 type QueryValidatorOutstandingRewardsParams struct {
 	ValidatorAddress sdk.ValAddress `json:"validator_address"`
+}
+
+func (params QueryValidatorOutstandingRewardsParams) ValidateInput() sdk.Error {
+
 }
 
 // creates a new instance of QueryValidatorOutstandingRewardsParams
