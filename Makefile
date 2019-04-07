@@ -99,8 +99,8 @@ install_debug: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/gaia/cmd/gaiadebug
 
 dist:
-	@bash publish/dist.sh
-	@bash publish/publish.sh
+	mkdir -p dist/
+	git archive --format tar.gz --prefix cosmos-sdk-$(VERSION)/ -o dist/cosmos-sdk-$(VERSION).tar.gz HEAD
 
 ########################################
 ### Tools & dependencies
@@ -122,6 +122,7 @@ clean:
 	rm -rf snapcraft-local.yaml build/
 
 distclean: clean
+	rm -rf dist/
 	rm -rf vendor/
 
 ########################################
