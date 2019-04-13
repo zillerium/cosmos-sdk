@@ -3,7 +3,7 @@ PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 CAT := $(if $(filter $(OS),Windows_NT),type,cat)
-LEDGER_ENABLED ?= true
+LEDGER_ENABLED ?= false
 GOBIN ?= $(GOPATH)/bin
 GOSUM := $(shell which gosum)
 
